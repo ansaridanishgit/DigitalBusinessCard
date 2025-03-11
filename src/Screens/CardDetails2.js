@@ -1,7 +1,47 @@
-import React from 'react';
-import { StyleSheet, View, Image, Text, StatusBar, Pressable } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { StyleSheet, View, Image, Text, StatusBar, Pressable, Alert, ActivityIndicator } from 'react-native';
+import ViewShot from 'react-native-view-shot';
+import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
 
-export default function CardDetails({ navigation }) {
+export default function CardDetails({ navigation, route }) {
+    const { cardData } = route.params;
+    const viewShotRef = useRef();
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // Request media library permission
+        (async () => {
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission Required', 'Please allow media library access to save screenshots.');
+            }
+        })();
+    }, []);
+
+    const captureScreenshot = async () => {
+        if (viewShotRef.current) {
+            try {
+                setLoading(true);
+
+                const uri = await viewShotRef.current.capture();
+
+                // Save to gallery
+                const asset = await MediaLibrary.createAssetAsync(uri);
+                await MediaLibrary.createAlbumAsync('BusinessCards', asset, false);
+
+                // Share the image
+                await Sharing.shareAsync(uri);
+
+                Alert.alert('Success', 'Screenshot saved and ready to share!');
+            } catch (error) {
+                Alert.alert('Error', 'Failed to capture screenshot. Try again.');
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor="#56acff" barStyle="light-content" translucent={true} />
@@ -12,47 +52,52 @@ export default function CardDetails({ navigation }) {
                     </Pressable>
                 </View>
             </View>
-            <View style={styles.upperView}>
-                {/* Profile Image and Name */}
-                <Image style={styles.mobilelogo} source={require('@/assets/images/profile.png')} />
-                <Text style={styles.userName}>User Name</Text>
-                <Text style={[styles.detailText, { alignSelf: 'center', color: '#343434' }]}>Software Engineer</Text>
-            </View>
 
-            {/* User Details Section */}
-            <View style={styles.detailsContainer}>
-                <View style={styles.detailRow}>
-                    <View style={[styles.icon2]}>
-                        <Image source={require('@/assets/images/phone.png')} style={styles.icon} />
-                    </View>
-                    <Text style={styles.detailText}>+91 9876543210</Text>
-                </View>
-                <View style={styles.detailRow}>
-                    <View style={[styles.icon2]}>
-                        <Image source={require('@/assets/images/mail.png')} style={styles.icon} />
-                    </View>
-                    <Text style={styles.detailText}>user@example.com</Text>
-                </View>
-            </View>
-
-            <View style={styles.detailsContainer}>
-
-                <View style={styles.detailRow}>
-                    <View style={[styles.icon2]}>
-                        <Image source={require('@/assets/images/company.png')} style={styles.icon} />
-                    </View>
-                    <Text style={styles.detailText}>ABC Pvt Ltd</Text>
+            {/* ViewShot Section */}
+            <ViewShot ref={viewShotRef} style={{ height: '80%' }}>
+                <View style={styles.upperView}>
+                    <Image style={styles.mobilelogo} source={require('@/assets/images/profile.png')} />
+                    <Text style={styles.userName}>{cardData.name}</Text>
+                    <Text style={[styles.detailText, { alignSelf: 'center', color: '#343434' }]}>{cardData.designation}</Text>
                 </View>
 
-                <View style={styles.detailRow}>
-                    <View style={[styles.icon2]}>
-                        <Image source={require('@/assets/images/address.png')} style={styles.icon} />
+                {/* User Details Section */}
+                <View style={styles.detailsContainer}>
+                    <View style={styles.detailRow}>
+                        <View style={[styles.icon2]}>
+                            <Image source={require('@/assets/images/phone.png')} style={styles.icon} />
+                        </View>
+                        <Text style={styles.detailText}>+91 {cardData.contactNumber}</Text>
                     </View>
-                    <Text style={styles.detailText}>123, Main Street, City, State</Text>
+                    <View style={styles.detailRow}>
+                        <View style={[styles.icon2]}>
+                            <Image source={require('@/assets/images/mail.png')} style={styles.icon} />
+                        </View>
+                        <Text style={styles.detailText}>{cardData.email}</Text>
+                    </View>
                 </View>
-            </View>
-            <Pressable onPress={() => navigation.navigate("QRCode")}>
+
+                <View style={styles.detailsContainer}>
+                    <View style={styles.detailRow}>
+                        <View style={[styles.icon2]}>
+                            <Image source={require('@/assets/images/company.png')} style={styles.icon} />
+                        </View>
+                        <Text style={styles.detailText}>{cardData.companyName}</Text>
+                    </View>
+                    <View style={styles.detailRow}>
+                        <View style={[styles.icon2]}>
+                            <Image source={require('@/assets/images/address.png')} style={styles.icon} />
+                        </View>
+                        <Text style={styles.detailText}>{cardData.address}</Text>
+                    </View>
+                </View>
+            </ViewShot>
+            <Pressable onPress={captureScreenshot}>
                 <Text style={{ fontSize: 14, color: '#56acff', alignSelf: 'center', textDecorationLine: 'underline' }}>Share Card</Text>
+            </Pressable>
+            <Text style={{ fontSize: 14, color: '#989898', marginVertical: 5, alignSelf: 'center' }}>OR</Text>
+            <Pressable onPress={() => navigation.navigate("QRCode", { cardData: cardData })}>
+                <Text style={{ fontSize: 14, color: '#56acff', alignSelf: 'center', textDecorationLine: 'underline' }}>Generate QR</Text>
             </Pressable>
         </View>
     );
@@ -99,7 +144,7 @@ const styles = StyleSheet.create({
     detailRow: {
         alignItems: 'center',
         marginBottom: 10,
-        width:'50%',
+        width: '50%',
     },
     icon: {
         width: 30,
@@ -111,8 +156,8 @@ const styles = StyleSheet.create({
     detailText: {
         fontSize: 16,
         color: '#989898',
-        textAlign:'center',
-        marginTop:5
+        textAlign: 'center',
+        marginTop: 5
     },
     headerContent: {
         width: '100%',

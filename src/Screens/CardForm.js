@@ -6,10 +6,11 @@ import styles2 from '@/src/Components/CSS/AuthStackCss';
 import ModalAlert from '@/src/Components/Modals/ModalAlert';
 import Loadercomponent from '@/src/Components/Loader';
 import * as ImagePicker from 'expo-image-picker';
-import { FIREBASE_APP, FIREBASE_DB } from '@/FirebaseConfig';
-import { addDoc, collection } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { FIREBASE_DB } from '@/FirebaseConfig';
+import { collection, addDoc, setDoc, doc } from 'firebase/firestore';
 
-export default function CardForm({ navigation }) {
+export default function CardForm({ navigation , route}) {
   const [name, setName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -32,6 +33,7 @@ export default function CardForm({ navigation }) {
   const [modalTitle, setModalTitle] = useState('');
   const [Loader, setLoader] = useState(false);
 
+  const {theme}= route.params
   const auth = FIREBASE_Auth;
 
   const validateEmail = (email) => {
@@ -71,16 +73,18 @@ export default function CardForm({ navigation }) {
       try {
         const imageURL = image ? await uploadImage(image, 'businessCards') : null;
         const logoURL = companyLogo ? await uploadImage(companyLogo, 'companyLogos') : null;
-        console.log("jjjjjj")
+        console.log("hooooo")
 
-        const docRef = await addDoc(collection(FIREBASE_DB, "Cards"), {
-          name: name || '',
-          companyName: companyName || '',
-          contactNumber: contactNumber || '',
-          designation: designation || '',
-          email: email || '',
-          address: address || '',
+        await addDoc(collection(FIREBASE_DB, "Cards" ), {
+          name: name,
+          companyName: companyName,
+          contactNumber: contactNumber,
+          designation: designation,
+          email: email,
+          address: address,
+          theme: theme,
         });
+        
 
         Alert.alert('Success', 'Card created successfully!');
         navigation.navigate('Home');
@@ -288,7 +292,7 @@ export default function CardForm({ navigation }) {
         </View>
 
         {/* Submit Button */}
-        <Pressable style={styles2.button} onPress={()=>navigation.navigate("Home")}>
+        <Pressable style={styles2.button} onPress={handleSignIn}>
           <Text style={styles2.buttonText}>Create Card</Text>
         </Pressable>
 

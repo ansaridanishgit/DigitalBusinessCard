@@ -1,17 +1,23 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import ChildHeader from '../Components/Headers/ChildHeader';
 
 export default function ChooseTheme({ navigation }) {
+    const [selectedTheme, setSelectedTheme] = useState(null);
+
+    const handleThemeSelection = (theme) => {
+        setSelectedTheme(theme);
+        navigation.navigate('CardForm', { theme:theme });
+    };
     return (
         <View style={styles.container}>
             <ChildHeader navigation={navigation} title={'Select Theme'} />
-            <Pressable style={{height:'50%'}} onPress={() => navigation.navigate('CardForm')}>
+            <Pressable style={{height:'50%'}} onPress={() => handleThemeSelection('Theme1')}>
                 <Image style={styles.image} source={require('@/assets/images/card1.jpg')}></Image>
                 <Text style={styles.text}>Theme 1</Text>
             </Pressable>
 
-            <Pressable style={{height:'50%'}} onPress={() => navigation.navigate('CardForm')}>
+            <Pressable style={{height:'50%'}} onPress={() => handleThemeSelection('Theme2')}>
                 <Image style={styles.image} source={require('@/assets/images/card2.jpg')}></Image>
                 <Text style={styles.text}>Theme 2</Text>
             </Pressable>

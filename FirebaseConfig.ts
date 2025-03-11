@@ -1,18 +1,20 @@
-import { initializeApp } from "firebase/app";
-import {getAuth} from 'firebase/auth'
-import {getFirestore} from 'firebase/firestore'
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCdyTVYEe36eLxFRNBcFVSeX806v5XPO2g",
-  authDomain: "taskmanagement-99777.firebaseapp.com",
-  projectId: "taskmanagement-99777",
-  storageBucket: "taskmanagement-99777.firebasestorage.app",
-  messagingSenderId: "502713758642",
-  appId: "1:502713758642:web:4e28069532a283875aeaab"
+  apiKey: "AIzaSyCifB3OWrW7BrRbHSM5MO9FTrRshGjeQGM",
+  authDomain: "businesscard-225c8.firebaseapp.com",
+  projectId: "businesscard-225c8",
+  storageBucket: "businesscard-225c8.firebasestorage.app",
+  messagingSenderId: "862648091307",
+  appId: "1:862648091307:web:86a527cf556f9bf692edee",
 };
 
+// Initialize Firebase only if it hasn't been initialized already
+export const FIREBASE_APP = getApps().length === 0 
+  ? initializeApp(firebaseConfig) 
+  : getApps()[0];
 
-// Initialize Firebase
-export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_Auth = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
