@@ -16,7 +16,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.danishexpo2.TaskManagement"
+      "package": "com.danishexpo2.BusinessCard"
     },
     "web": {
       "bundler": "metro",
@@ -43,7 +43,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "649505ec-d712-4796-a1db-2859ecaa0dfc"
+        "projectId": "b5e57393-8e45-4f54-9726-e4c15b8ab495"
       }
     }
   }

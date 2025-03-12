@@ -8,7 +8,7 @@ export default function CommonHeader({ navigation }) {
             <View style={styles.headerContent}>
                 <View style={styles.headerLeftView}>
                     <View style={{ marginLeft: 25}}>
-                        <Text style={styles.address}>Welcome Danish!</Text>
+                        <Text style={styles.address}>Welcome User!</Text>
                     </View>
                 </View>
                 <View style={styles.headerRightView}>

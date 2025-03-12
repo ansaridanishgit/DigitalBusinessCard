@@ -3,6 +3,8 @@ import { StyleSheet, View, Image, Text, StatusBar, Pressable, Alert, ActivityInd
 import ViewShot from 'react-native-view-shot';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { FIREBASE_DB } from '@/FirebaseConfig';
 
 export default function CardDetails({ navigation, route }) {
     const { cardData } = route.params;
@@ -19,6 +21,21 @@ export default function CardDetails({ navigation, route }) {
         })();
     }, []);
 
+    const deleteCardData = async (cardData) => {
+        if (!cardData?.id) {
+            console.error("Error: Document ID is missing!");
+            return;
+        }
+        try {
+            const cardRef = doc(FIREBASE_DB, "Cards", cardData.id);
+    
+            await deleteDoc(cardRef);
+            Alert.alert("Deleted","Card deleted successfully!");
+            navigation.navigate('Home')
+        } catch (error) {
+            console.error("Error deleting card:", error);
+        }
+    };
     const captureScreenshot = async () => {
         if (viewShotRef.current) {
             try {
@@ -32,8 +49,6 @@ export default function CardDetails({ navigation, route }) {
 
                 // Share the image
                 await Sharing.shareAsync(uri);
-
-                Alert.alert('Success', 'Screenshot saved and ready to share!');
             } catch (error) {
                 Alert.alert('Error', 'Failed to capture screenshot. Try again.');
             } finally {
@@ -52,6 +67,14 @@ export default function CardDetails({ navigation, route }) {
                         <View style={styles.headerLeftView}>
                             <Pressable style={styles.backbtnview} onPress={() => navigation.goBack()}>
                                 <Image source={require('@/assets/images/back2.png')} style={styles.backbtn} />
+                            </Pressable>
+                        </View>
+                        <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => navigation.navigate('CardUpdate', { cardData: cardData })}>
+                                <Image style={[styles.backbtn,{marginHorizontal:15}]} source={require('@/assets/images/edit.png')}></Image>
+                            </Pressable>
+                            <Pressable onPress={()=>deleteCardData(cardData)}>
+                                <Image style={styles.backbtn} source={require('@/assets/images/delete.png')}></Image>
                             </Pressable>
                         </View>
                     </View>

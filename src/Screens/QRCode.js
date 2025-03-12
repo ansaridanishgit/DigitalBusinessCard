@@ -7,10 +7,17 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 
 export default function QRCodeScreen({ navigation, route }) {
-    const { firestoreLink } = route.params;
+    const { cardData } = route.params || {}; 
     const viewShotRef = useRef();
     const [permissionGranted, setPermissionGranted] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Extract values safely
+    const name = cardData?.name || 'Unknown Name';
+    const contactNumber = cardData?.contactNumber || 'No Contact';
+
+    // Generate QR Code value
+    const qrValue = JSON.stringify({ name, contactNumber });
 
     // Request permission for Media Library
     useEffect(() => {
@@ -19,17 +26,14 @@ export default function QRCodeScreen({ navigation, route }) {
             setPermissionGranted(status === 'granted');
         })();
     }, []);
-
     const captureScreenshot = async () => {
         if (!permissionGranted) {
             Alert.alert('Permission Required', 'Please allow media storage permission.');
             return;
         }
-
         if (viewShotRef.current) {
             try {
                 const uri = await viewShotRef.current.capture();
-
                 const asset = await MediaLibrary.createAssetAsync(uri);
                 await MediaLibrary.createAlbumAsync('CouponScreenshots', asset, false);
 
@@ -45,25 +49,22 @@ export default function QRCodeScreen({ navigation, route }) {
             }
         }
     };
-
     return (
         <View style={{ width: '100%', height: '100%' }}>
             <ChildHeader navigation={navigation} title={'QR Code'} />
             <ViewShot ref={viewShotRef}>
                 <View style={styles.qrContainer}>
                     <QRCode
-                        value={firestoreLink}
+                        value={qrValue}
                         size={250}
                         color="#000"
                         backgroundColor="#fff"
                     />
                 </View>
             </ViewShot>
-
-            <Text style={{ fontSize: 17, alignSelf: 'center', marginTop: 10, color: "#5b5b5b" }}>
+            <Text style={{ fontSize: 17, alignSelf: 'center', marginTop: 20, color: "#5b5b5b" }}>
                 Scan this QR to receive business card
             </Text>
-
             <Pressable onPress={captureScreenshot}>
                 <Text style={{ fontSize: 14, color: '#56acff', alignSelf: 'center', textDecorationLine: 'underline', marginTop: 5 }}>
                     {loading ? 'Sharing...' : 'Share QR'}
@@ -72,7 +73,6 @@ export default function QRCodeScreen({ navigation, route }) {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     qrContainer: {
         width: 250,

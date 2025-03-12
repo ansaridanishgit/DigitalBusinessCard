@@ -12,12 +12,12 @@ export default function ChooseTheme({ navigation }) {
     return (
         <View style={styles.container}>
             <ChildHeader navigation={navigation} title={'Select Theme'} />
-            <Pressable style={{height:'50%'}} onPress={() => handleThemeSelection('Theme1')}>
+            <Pressable style={{height:'40%'}} onPress={() => handleThemeSelection('Theme1')}>
                 <Image style={styles.image} source={require('@/assets/images/card1.jpg')}></Image>
                 <Text style={styles.text}>Theme 1</Text>
             </Pressable>
 
-            <Pressable style={{height:'50%'}} onPress={() => handleThemeSelection('Theme2')}>
+            <Pressable style={{height:'40%'}} onPress={() => handleThemeSelection('Theme2')}>
                 <Image style={styles.image} source={require('@/assets/images/card2.jpg')}></Image>
                 <Text style={styles.text}>Theme 2</Text>
             </Pressable>
@@ -37,7 +37,8 @@ const styles = StyleSheet.create({
         marginTop: 10,
         borderWidth: 3,
         borderColor: '#5b5b5b',
-        borderRadius: 10
+        borderRadius: 10,
+        resizeMode:'cover'
     },
     text: {
         fontSize: 16,

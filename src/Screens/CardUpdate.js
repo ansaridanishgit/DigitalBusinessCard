@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { FIREBASE_Auth } from '@/FirebaseConfig';
@@ -8,7 +8,7 @@ import Loadercomponent from '@/src/Components/Loader';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FIREBASE_DB } from '@/FirebaseConfig';
-import { collection, addDoc, setDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc, updateDoc } from 'firebase/firestore';
 
 export default function CardForm({ navigation , route}) {
   const [name, setName] = useState('');
@@ -33,9 +33,17 @@ export default function CardForm({ navigation , route}) {
   const [modalTitle, setModalTitle] = useState('');
   const [Loader, setLoader] = useState(false);
 
-  const {theme}= route.params
+  const {cardData}= route.params
   const auth = FIREBASE_Auth;
 
+  useEffect(()=>{
+    setName(cardData.name)
+    setCompanyName(cardData.companyName)
+    setContactNumber(cardData.contactNumber)
+    setDesignation(cardData.designation)
+    setEmail(cardData.email)
+    setAddress(cardData.address)
+  },[])
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -75,17 +83,17 @@ export default function CardForm({ navigation , route}) {
         const logoURL = companyLogo ? await uploadImage(companyLogo, 'companyLogos') : null;
         console.log("hooooo")
 
-        await addDoc(collection(FIREBASE_DB, "Cards" ), {
+        await updateDoc(doc(FIREBASE_DB, "Cards", cardData.id ), {
           name: name,
           companyName: companyName,
           contactNumber: contactNumber,
           designation: designation,
           email: email,
           address: address,
-          theme: theme,
+          theme: cardData.theme,
         });
         
-        Alert.alert('Success', 'Card created successfully!');
+        Alert.alert('Success', 'Card updated successfully!');
         navigation.navigate('Home');
       } catch (error) {
         Alert.alert('Error', 'Failed to create card. Please try again.');
@@ -165,7 +173,7 @@ export default function CardForm({ navigation , route}) {
   return (
     <ScrollView>
       <View style={[styles2.container,{justifyContent:'flex-start'}]}>
-        <Text style={styles2.title}>Create Your Business Card</Text>
+        <Text style={styles2.title}>Update Your Business Card</Text>
 
         {/* Name */}
         <TextInput
@@ -290,7 +298,7 @@ export default function CardForm({ navigation , route}) {
 
         {/* Submit Button */}
         <Pressable style={styles2.button} onPress={handleSignIn}>
-          <Text style={styles2.buttonText}>Create Card</Text>
+          <Text style={styles2.buttonText}>Update Card</Text>
         </Pressable>
 
         {/* Modal for Error Messages */}

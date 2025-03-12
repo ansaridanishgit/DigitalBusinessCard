@@ -8,6 +8,7 @@ import CardDetails from '../Screens/CardDetails'
 import QRCode from '../Screens/QRCode'
 import CardDetails2 from '../Screens/CardDetails2'
 import ChooseTheme from '../Screens/ChooseTheme'
+import CardUpdate from '../Screens/CardUpdate'
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ const AppStack = () => {
       <Stack.Screen name="QRCode" component={QRCode} />
       <Stack.Screen name="CardDetails2" component={CardDetails2} />
       <Stack.Screen name="ChooseTheme" component={ChooseTheme} />
+      <Stack.Screen name="CardUpdate" component={CardUpdate} />
     </Stack.Navigator>
   );
 };
